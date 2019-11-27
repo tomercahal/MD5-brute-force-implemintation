@@ -123,7 +123,7 @@ class Server (object):
             write_or_create_text_file('True')
             print 'The number has been found!! It is: ' + parts[1]
         else:
-            print 'Number has not been found yet I will keep searching!\r\n'
+            print 'Number has not been found yet I will keep searching!\r\n'  # Just a quick update for every run
 
 
 if __name__ == '__main__':
