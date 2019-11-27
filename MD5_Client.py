@@ -8,6 +8,26 @@ import os
 
 #############################################  ANSWER IS: 3735928559 ###################################################
 
+
+def write_or_create_text_file(data):
+    """This function creates a text file on the client's computer"""
+    with open('Found number.txt', 'w') as f:
+        if data == 'create':
+            print 'created text file'
+            f.write('False')
+        else:
+            f.write(data)
+
+
+def check_if_found():
+    """Since multiprocessing creates an entirely new instance of python, I need a way to share a variable between
+     my threads. I chose to make a text file and write in it,
+     this function checks if the number has been found already"""
+    with open('Found number.txt', 'r') as f:
+        data = f.read()
+        return data
+
+
 def check_hash(num):
     """This function gets a number as the input and returns the hash code of the number that was the input."""
     hashAlgo = hashlib.md5()
@@ -24,7 +44,6 @@ class Client (object):
         self.PORT = 220  # The port of the client.
         self.cores = 0  # A variable that contains the amount of cores the pc has
         self.processes_running = []  # A list of all the processes running at the time
-        self.found = False
 
     def start(self):
         """Sort of like the main function, it binds a socket connection to the server and gets the jobs that he asks."""
@@ -35,11 +54,12 @@ class Client (object):
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((self.IP, self.PORT))
 
-            print('connected to server')
+            print('Connected to server!')
             msg = sock.recv(1024)
-            print('received message: %s' % msg.decode())
+            print(msg.decode())
             self.cores = multiprocessing.cpu_count()
             print "The amount of cores this client has is: " + str(self.cores)
+            write_or_create_text_file('create')  # Creates the text file in the client's directory
             self.handle_server_job(sock)
 
         except socket.error as e:
@@ -49,19 +69,24 @@ class Client (object):
     def run_over_range(self, start_num, end_num, hash_needed, que):
         """This function is called on each process and it goes over the range of the numbers that
          the process needs to go over"""
-        while not self.found and start_num != end_num:  # If number not found yet or start num isn't equal to end num
+        found = check_if_found()
+        while found and start_num != end_num:  # If number not found yet or start num isn't equal to end num
             hash_of_num = check_hash(start_num)
             if hash_of_num == hash_needed:
-                print 'number found!'
+                print '\r\nnumber found!!!!!!!!!!!\r\n'
                 que.put(start_num)  # inserting the value of the number into a queue
-                self.found = True
+                write_or_create_text_file('True')  # Telling all the other processes that we have found the number.
                 break
+            found = check_if_found()  # Checking maybe another process has found the number
             start_num += 1
 
     def handle_server_job(self, server_socket):
-        print 'im in handle server job'
-        while not self.found:
+        found = 'False'  # On initial run it needs to be False (no way someone found it yet).
+        while found != 'True':
             job = sock.recv(1024)  # Getting the range and hash from the server
+            if 'Unfortunately' in job:
+                print job
+                os._exit(1)  #Closing the program
             print 'The job is: ' + str(job)
             parts_of_job = job.split('/')  # This splits according to the the protocol the server transfers the details.
             print parts_of_job
@@ -75,18 +100,20 @@ class Client (object):
             for i in range(self.cores):
                 print 'Started process number: ' + str(i+1)  # Adding 1 so it would not start from 0
                 print 'These are the args:\r\n' + str(start_num + (i * each_core_work)), \
-                    str(start_num + ((i+1) * each_core_work)), OG_HASH, que, self.found
-                p = multiprocessing.Process(target=self.run_over_range, args=(start_num + i * each_core_work, start_num +
-                                                                         (i+1) * each_core_work, OG_HASH, que))
+                        str(start_num + ((i+1) * each_core_work)), OG_HASH, que, '\r\n'
+                p = multiprocessing.Process(target=self.run_over_range, args=(start_num + (i * each_core_work), start_num +
+                                                                              ((i+1) * each_core_work), OG_HASH, que))
                 p.start()  # Letting the thread start running in the background.
-
             p.join()  # Waiting for the last thread to finish up
-
             if not que.empty():  # if there is a number in the queue it means that we found the number
+                print 'Sending to server found'
                 number_found = que.get()
                 server_socket.send('True/' + str(number_found))  # Send to server, number found
+                print server_socket.recv(1024)
             else:
+                print 'Sending to server not found'
                 server_socket.send('False/None')  # Send to server number has not been found
+            found = check_if_found()  # Checking if a process has found the number
 
 
 if __name__ == '__main__':
