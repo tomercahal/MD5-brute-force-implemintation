@@ -9,7 +9,7 @@ FYI: The program also creates two text files while running. One will be called `
 
 I hope you enjoy this project, and if you have and suggestions please let me know!
 
-Link to a video of me showing the project will be avaiable in the upcoming days.:grin:
+[![MD5 Brute Force implementation (Python)!!](https://i.ibb.co/L5qQnLh/https-i-ytimg-com-vi-b6-Sdx-W8c-OQY-maxresdefault.jpg)](https://www.youtube.com/watch?v=b6SdxW8cOQY "MD5 Brute Force implementation (Python)!!")
 
 
 
