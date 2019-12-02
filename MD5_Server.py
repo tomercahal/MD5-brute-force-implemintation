@@ -11,7 +11,6 @@ def write_or_create_text_file(data):
     """This function creates a text file on the client's computer"""
     with open('Server found number.txt', 'w') as f:
         if data == 'create':  # In the first time we need to create a text file
-            print 'created text file'
             f.write('False')  # Start it up as False
         else:
             f.write(data)
@@ -32,7 +31,7 @@ class Server (object):  # The server's class
         self.IP = '127.0.0.1'  # The IP of the server.
         self.PORT = 220  # The chose port to have the connection on
         self.HASH = 'EC9C0F7EDCC18A98B1F31853B1813301'  # This is the hash that we need to match (the answer md5d)
-        self.START_NUM = 3735708558  # The number that the hash starts with, setting it up close so won't take so long
+        self.START_NUM = 3735508558  # The number that the hash starts with, setting it up close so won't take so long
         self.FINISH_NUM = 9999999999  # The number that the hash ends with
         self.CHOSEN_RANGE = 10000  # This is the range that the client will go over each time
         self.active_users = []  # This is a list containing the threads that are active and if there are any open
@@ -70,6 +69,7 @@ class Server (object):  # The server's class
 
             print('Server starting up on ip %s port %s' % (self.IP, self.PORT))
             # Create a TCP/IP socket
+            print '\r\nToday we are looking for this MD5 hash: ' + self.HASH + '\r\nHopefully we can find it!'
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.bind((self.IP, self.PORT))
             sock.listen(1)
@@ -118,10 +118,10 @@ class Server (object):  # The server's class
         response = client_socket.recv(1024)  # Getting the response from the user.
         parts = response.split('/')  # Splitting the user's answer.
         bool_found = parts[0]
-        print parts[0], 'num is: ' + parts[1]
+        print 'Did the user find the number? ' + parts[0], 'num is: ' + parts[1]  # parts[0] is True or False, parts[1] is the number or None
         if bool_found == 'True':  # If the number has been found
             write_or_create_text_file('True')
-            print 'The number has been found!! It is: ' + parts[1]
+            print 'The number has been found!!!!! It is: ' + parts[1]
         else:
             print 'Number has not been found yet I will keep searching!\r\n'  # Just a quick update for every run
 

@@ -2,7 +2,7 @@ import socket
 import multiprocessing
 import hashlib
 import os
-
+import time
 
 #############################################  ANSWER IS: 3735928559 ###################################################
 
@@ -11,7 +11,6 @@ def write_or_create_text_file(data):
     """This function creates a text file on the client's computer"""
     with open('Found number.txt', 'w') as f:
         if data == 'create':  # On the initial run, I need to create a text file if there isn't one
-            print 'created text file'
             f.write('False')
         else:
             f.write(data)  # This is used when the number is found, change the value to True
@@ -28,10 +27,10 @@ def check_if_found():
 
 def check_hash(num):
     """This function gets a number as the input and returns the MD5 hash code of the number that was the input."""
-    hashAlgo = hashlib.md5()
+    num_hash = hashlib.md5()
     pw = str(num)
-    hashAlgo.update(pw.encode('utf-8'))
-    hash = hashAlgo.hexdigest()
+    num_hash.update(pw.encode('utf-8'))
+    hash = num_hash.hexdigest()
     return hash
 
 
@@ -58,6 +57,8 @@ class Client (object):  # The client's class
             print "The amount of cores this client has is: " + str(self.cores)
             write_or_create_text_file('create')  # Creates the text file in the client's directory
             self.handle_server_job(sock)
+            time.sleep(100)  # We don't want the user to close the connection by himself, we want the connection to be
+            # closed from the semaphore on the server side
 
         except socket.error as e:
             print(e)
