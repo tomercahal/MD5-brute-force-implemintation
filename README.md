@@ -7,7 +7,7 @@ In this project I used python 2.7. As of right now the client's are looking for 
 FYI: The program also creates two text files while running. One will be called `Server found number` (server side), the other one will be called `Found number` (client side). These two text files are used in the program and will contain either True or False. You should not worry about them. I used them to communicate between processes on the client's side, something that was easier and neater then using Queue again.
 
 
-I hope you enjoy this project, and if you have and suggestions please let me know!
+I hope you enjoy this project, and if you have any suggestions please let me know!
 
 [![MD5 Brute Force implementation (Python)!!](https://i.ibb.co/L5qQnLh/https-i-ytimg-com-vi-b6-Sdx-W8c-OQY-maxresdefault.jpg)](https://www.youtube.com/watch?v=b6SdxW8cOQY "MD5 Brute Force implementation (Python)!!")
 
